@@ -7,7 +7,7 @@
     <ProjectGuid>{6C29A704-14FD-4CF4-ABDE-8D6782F3C665}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>MushRoom</RootNamespace>
-    <AssemblyName>MushRoom</AssemblyName>
+    <AssemblyName>MushRoom FLAC</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2050
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FLAC-WAV-Converter", "MushRoom\FLAC-WAV-Converter.csproj", "{6C29A704-14FD-4CF4-ABDE-8D6782F3C665}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FLAC-Converter", "MushRoom\FLAC-Converter.csproj", "{6C29A704-14FD-4CF4-ABDE-8D6782F3C665}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -542,7 +542,7 @@
 </value>
   </data>
   <data name="$this.Text" xml:space="preserve">
-    <value>FLAC Converter</value>
+    <value>Mushroom FLAC Converter</value>
   </data>
   <data name="&gt;&gt;toolStripStatusLabel1.Name" xml:space="preserve">
     <value>toolStripStatusLabel1</value>
