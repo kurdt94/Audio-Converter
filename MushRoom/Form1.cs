@@ -15,6 +15,8 @@ namespace MushRoom
     public partial class Form1 : Form
     {
         public string customTarget;
+        public string ffoutput;
+        public int progress;
 
         public Form1()
         {
@@ -22,9 +24,8 @@ namespace MushRoom
 
             // Attach Event Handlers to BackgroundWorker
             backgroundWorker1.WorkerSupportsCancellation = true;
-            backgroundWorker1.RunWorkerCompleted +=
-                new RunWorkerCompletedEventHandler(
-            backgroundWorker1_RunWorkerCompleted);
+            backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker1_RunWorkerCompleted);
+            backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker1_ProgressChanged);
 
             toolStripStatusLabel2.Text = " > (" + Properties.Settings.Default.quality + "Kbps)";
             // label1.Text = Properties.Settings.Default.key01;
@@ -92,6 +93,9 @@ namespace MushRoom
         // Parse the FLAC file
         private void parseFlac(string file) {
 
+
+            StreamReader SROutput = null;
+
             // Set
             string flac_file = file;
             string mp3_file = Path.ChangeExtension(file, ".mp3");
@@ -110,6 +114,7 @@ namespace MushRoom
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.CreateNoWindow = true;
+            startInfo.RedirectStandardError = true;
             startInfo.UseShellExecute = false;
             startInfo.FileName = Application.StartupPath + @"\common\ffmpeg.exe";
             startInfo.WindowStyle = ProcessWindowStyle.Hidden;
@@ -120,20 +125,64 @@ namespace MushRoom
             // Run FFMPEG
             try
             {
-                using (Process exeProcess = Process.Start(startInfo))
+                Process exeProcess = Process.Start(startInfo);
+                SROutput = exeProcess.StandardError;
+
+                //ffoutput = SROutput.ReadToEnd();
+
+                // progression
+                int total_seconds = 0;
+                int current_second = 0;
+                int subprogress = 0;
+
+                // Read FFMPEG Output and update Progression
+                do
                 {
-                    exeProcess.WaitForExit();
-                }
+                    string s = SROutput.ReadLine();
+                    ffoutput += s + "\n";
+
+                    // get total duration
+                    if (s.Contains("Duration: "))
+                    {
+                      total_seconds = this.ConverttoSeconds(s.Substring(s.LastIndexOf("Duration: "), 18).Replace("Duration: ", ""));
+                      //Console.WriteLine(total_seconds);
+                    }
+
+                    // check for progression
+                    if (s.Contains("size= ") && s.Contains("time="))
+                    {
+                        current_second = this.ConverttoSeconds(s.Substring(s.LastIndexOf("time="), 13).Replace("time=", ""));
+
+                        if (total_seconds != 0) {
+                            subprogress = (100 * current_second) / total_seconds;
+                            //Console.WriteLine(subprogress + " " + mp3_file);
+                            backgroundWorker1.ReportProgress(subprogress);
+                        }
+
+                    }
+
+                } while (!SROutput.EndOfStream);
+
+                // wait for exit and close process
+                exeProcess.WaitForExit();
+                exeProcess.Close();
+                exeProcess.Dispose(); // needed ?  ?
+                
             }
             catch (Exception ex)
             {
                    Console.WriteLine(ex);
             }
 
-            // convert the file
-            // ffmpeg -i input.flac -ab 320k -map_metadata 0 -id3v2_version 3 output.mp3
+        }
 
-
+        // Convert Track lenght to seconds
+        private int ConverttoSeconds(string s)
+        {
+            //we can just parse a time format "00:00:11" and return an integer
+            double seconds = TimeSpan.Parse(s).TotalSeconds;
+            return Convert.ToInt32(seconds);
+            
         }
 
         // Settings
@@ -161,12 +210,11 @@ namespace MushRoom
         {
 
             BackgroundWorker worker = sender as BackgroundWorker;
-
             string convert = (string)e.Argument;
 
             // Update status bar 
             toolStripStatusLabel1.Text = "Starting conversion !";
-            int i = 1;
+            int i = 1; // no need for this really
             foreach (var listBoxItem in listBox1.Items)
             {
                 // check cancel
@@ -176,18 +224,21 @@ namespace MushRoom
                 }
         
                 // Parse the FLAC file
-                i++;
+                i++;  // no need for this really 
                 this.parseFlac(listBoxItem.ToString());
             }
-            //
             e.Result = true;
-            //e.Cancel = true;
-         
+
         }
 
+        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            progressBar1.Value = e.ProgressPercentage;
+        }
 
-    // This event handler deals with the results of the background operation.
-    private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+   
+        // This event handler deals with the results of the background operation.
+        private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Cancelled == true)
             {
@@ -203,7 +254,7 @@ namespace MushRoom
                 button3.Enabled = false;
                 button2.Enabled = true;
                 listBox1.Items.Clear();
-
+                progressBar1.Value = 0;
             }
         }
         
@@ -218,15 +269,23 @@ namespace MushRoom
             }
         }
 
+        // DrawItem ( currently not used, need to convert listbox to objects and such (map coloring class) ) 
         private void listBox1_DrawItem(object sender, DrawItemEventArgs e)
         {
             e.DrawBackground();
             e.Graphics.DrawString(listBox1.Items[e.Index].ToString(), listBox1.Font, Brushes.Green, e.Bounds);
         }
 
+        // Nothing ?
         private void Form1_Load(object sender, EventArgs e)
         {
 
+        }
+
+        // clear list
+        private void button4_Click(object sender, EventArgs e)
+        {
+            listBox1.Items.Clear();
         }
     }
 }
