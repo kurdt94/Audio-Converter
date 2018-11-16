@@ -12,3 +12,6 @@ basic functions:
 - can Output to a target location
 - can Ask for a target location
 - progress of each conversion is shown in a progressbar
+
+Note:
+Lossy MP3 should not be used for archiving, since the nature of lossy encoding always changes the original sound, even if it sounds transparent. Use lossless codecs for this purpose.
