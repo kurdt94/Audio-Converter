@@ -61,11 +61,6 @@ namespace MushRoom
             }
         } 
 
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
         // Click CONVERT button
         private void button1_Click(object sender, EventArgs e)
         {
@@ -92,7 +87,6 @@ namespace MushRoom
 
         // Parse the FLAC file
         private void parseFlac(string file) {
-
 
             StreamReader SROutput = null;
 
@@ -140,12 +134,11 @@ namespace MushRoom
                 {
                     string s = SROutput.ReadLine();
                   
-
                     // get total duration
                     if (s.Contains("Duration: "))
                     {
                       total_seconds = this.ConverttoSeconds(s.Substring(s.LastIndexOf("Duration: "), 18).Replace("Duration: ", ""));
-                      //Console.WriteLine(total_seconds);
+                    //Console.WriteLine(total_seconds);
                     }
 
                     // check for progression
@@ -181,8 +174,7 @@ namespace MushRoom
         {
             //we can just parse a time format "00:00:11" and return an integer
             double seconds = TimeSpan.Parse(s).TotalSeconds;
-            return Convert.ToInt32(seconds);
-            
+            return Convert.ToInt32(seconds); 
         }
 
         // Settings
@@ -193,16 +185,12 @@ namespace MushRoom
             Settings.Show();
         }
 
-
         // Reload Settings 
         public void refreshing() {
-
-           
+            
             Properties.Settings.Default.Reload();
             toolStripStatusLabel2.Text = "@" + Properties.Settings.Default.quality + " Kbps >";
             this.Refresh();
-            //label1.Text = Properties.Settings.Default.quality;
-
         }
 
         // Background Worker
