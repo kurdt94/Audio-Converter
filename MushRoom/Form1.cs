@@ -15,8 +15,6 @@ namespace MushRoom
     public partial class Form1 : Form
     {
         public string customTarget;
-        public string ffoutput;
-        public int progress;
 
         public Form1()
         {
@@ -139,7 +137,7 @@ namespace MushRoom
                 do
                 {
                     string s = SROutput.ReadLine();
-                    ffoutput += s + "\n";
+                  
 
                     // get total duration
                     if (s.Contains("Duration: "))
@@ -243,6 +241,9 @@ namespace MushRoom
             if (e.Cancelled == true)
             {
                 toolStripStatusLabel1.Text = "Conversion canceled!";
+                button3.Enabled = false;
+                button1.Enabled = true;
+                progressBar1.Value = 0;
             }
             else if (e.Error != null)
             {
@@ -263,9 +264,7 @@ namespace MushRoom
         {
             if (backgroundWorker1.WorkerSupportsCancellation == true)
             {
-                // Cancel the asynchronous operation.
                 backgroundWorker1.CancelAsync();
-             
             }
         }
 
