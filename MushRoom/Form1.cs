@@ -44,6 +44,13 @@ namespace MushRoom
         // On Drop
         void Form1_DragDrop(object sender, DragEventArgs e)
         {
+
+            // Don't drop on running progress
+            if (backgroundWorker1.IsBusy == true)
+            {
+                MessageBox.Show("Can't drop files while running", "Message", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             foreach (string file in files) { this.canAdd(file); }
         }
@@ -58,7 +65,7 @@ namespace MushRoom
                 button4.Enabled = true;
             }
             else {
-               // listBox1.Items.Add(Path.GetExtension(item));
+             
             }
         } 
 
@@ -82,6 +89,7 @@ namespace MushRoom
                 button2.Enabled = false;
                 button3.Enabled = true;
                 button4.Enabled = false;
+                this.AllowDrop = false;
                 // Start the asynchronous operation.
                 backgroundWorker1.RunWorkerAsync();
             }
@@ -244,10 +252,12 @@ namespace MushRoom
                 button1.Enabled = true;
                 progressBar1.Value = 0;
                 this.cancel = false;
+                this.AllowDrop = true;
             }
             else if (e.Error != null)
             {
                 toolStripStatusLabel3.Text = "Error while converting: " + e.Error.Message;
+
             }
             else
             {
@@ -256,6 +266,7 @@ namespace MushRoom
                 button2.Enabled = true;
                 listBox1.Items.Clear();
                 progressBar1.Value = 0;
+                this.AllowDrop = true;
             }
         }
         
