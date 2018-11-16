@@ -192,7 +192,7 @@ namespace MushRoom
         {
             // Open Settings
             var Settings = new Form2(this);
-            Settings.Show();
+            Settings.ShowDialog();
         }
 
         // Reload Settings 
