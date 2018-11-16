@@ -55,6 +55,7 @@ namespace MushRoom
             {
                 listBox1.Items.Add(item);
                 button1.Enabled = true;
+                button4.Enabled = true;
             }
             else {
                // listBox1.Items.Add(Path.GetExtension(item));
@@ -80,6 +81,7 @@ namespace MushRoom
                 button1.Enabled = false;
                 button2.Enabled = false;
                 button3.Enabled = true;
+                button4.Enabled = false;
                 // Start the asynchronous operation.
                 backgroundWorker1.RunWorkerAsync();
             }
@@ -284,6 +286,7 @@ namespace MushRoom
         private void button4_Click(object sender, EventArgs e)
         {
             listBox1.Items.Clear();
+            button4.Enabled = false;
         }
     }
 }
