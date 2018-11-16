@@ -7,7 +7,7 @@ using System.Drawing;
 
 
 // NOTES
-// @TODO : progressbar, highlight current file state, settings for file save, allow directory drop (ifDirectory --> scan directory funct.) 
+// @TODO : highlight current state, allow directory drop? 
 // 
 //
 namespace MushRoom
@@ -98,7 +98,7 @@ namespace MushRoom
         // Parse the FLAC file
         private void parseFlac(string file) {
 
-            StreamReader SROutput = null;
+            StreamReader FFOutput = null;
 
             // Set
             string flac_file = file;
@@ -130,7 +130,7 @@ namespace MushRoom
             try
             {
                 Process exeProcess = Process.Start(startInfo);
-                SROutput = exeProcess.StandardError;
+                FFOutput = exeProcess.StandardError;
 
                 //ffoutput = SROutput.ReadToEnd();
 
@@ -142,7 +142,7 @@ namespace MushRoom
                 // Read FFMPEG Output and update Progression
                 do
                 {
-                    string s = SROutput.ReadLine();
+                    string s = FFOutput.ReadLine();
                   
                     // get total duration
                     if (s.Contains("Duration: "))
@@ -164,7 +164,7 @@ namespace MushRoom
 
                     }
 
-                } while (!SROutput.EndOfStream);
+                } while (!FFOutput.EndOfStream);
 
                 // wait for exit and close process
                 exeProcess.WaitForExit();
