@@ -15,6 +15,7 @@ namespace MushRoom
     public partial class Form1 : Form
     {
         public string customTarget;
+        public bool cancel;
 
         public Form1()
         {
@@ -25,12 +26,13 @@ namespace MushRoom
             backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker1_RunWorkerCompleted);
             backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker1_ProgressChanged);
 
-            toolStripStatusLabel2.Text = " > (" + Properties.Settings.Default.quality + "Kbps)";
-            // label1.Text = Properties.Settings.Default.key01;
+            toolStripStatusLabel2.Text = "@" + Properties.Settings.Default.quality + " Kbps >";
+
             // Set Drop Functionality
+            this.cancel = false;
             this.AllowDrop = true;
-            this.DragEnter += new DragEventHandler(Form1_DragEnter); // <--
-            this.DragDrop += new DragEventHandler(Form1_DragDrop); // <--
+            this.DragEnter += new DragEventHandler(Form1_DragEnter); 
+            this.DragDrop += new DragEventHandler(Form1_DragDrop); 
         }
 
         // On Enter
@@ -98,7 +100,7 @@ namespace MushRoom
             string flac_file = file;
             string mp3_file = Path.ChangeExtension(file, ".mp3");
             string quality = Properties.Settings.Default.quality;
-            toolStripStatusLabel1.Text = "creating " + Path.GetFileName(mp3_file) + " ... ";
+            toolStripStatusLabel3.Text = "Creating " + Path.GetFileName(mp3_file) + " ... ";
 
             if(Properties.Settings.Default.samefolder == false && Directory.Exists(Properties.Settings.Default.target.ToString())){
                 mp3_file = Properties.Settings.Default.target + "\\" + Path.GetFileName(file);
@@ -197,7 +199,7 @@ namespace MushRoom
 
            
             Properties.Settings.Default.Reload();
-            toolStripStatusLabel2.Text = " > (" + Properties.Settings.Default.quality + "Kbps)";
+            toolStripStatusLabel2.Text = "@" + Properties.Settings.Default.quality + " Kbps >";
             this.Refresh();
             //label1.Text = Properties.Settings.Default.quality;
 
@@ -211,7 +213,7 @@ namespace MushRoom
             string convert = (string)e.Argument;
 
             // Update status bar 
-            toolStripStatusLabel1.Text = "Starting conversion !";
+            toolStripStatusLabel3.Text = "Starting conversion !";
             int i = 1; // no need for this really
             foreach (var listBoxItem in listBox1.Items)
             {
@@ -231,27 +233,35 @@ namespace MushRoom
 
         private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            progressBar1.Value = e.ProgressPercentage;
+            if (this.cancel)
+            {
+                toolStripStatusLabel3.Text = "Stopping conversion ...";
+            }
+            else {
+                progressBar1.Value = e.ProgressPercentage;
+            }
+           
         }
 
    
         // This event handler deals with the results of the background operation.
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (e.Cancelled == true)
+            if (e.Cancelled == true || this.cancel)
             {
-                toolStripStatusLabel1.Text = "Conversion canceled!";
+                toolStripStatusLabel3.Text = "Last conversion canceled !";
                 button3.Enabled = false;
                 button1.Enabled = true;
                 progressBar1.Value = 0;
+                this.cancel = false;
             }
             else if (e.Error != null)
             {
-                toolStripStatusLabel1.Text = "Error while converting: " + e.Error.Message;
+                toolStripStatusLabel3.Text = "Error while converting: " + e.Error.Message;
             }
             else
             {
-                toolStripStatusLabel1.Text = "Finished conversion !";
+                toolStripStatusLabel3.Text = "Finished converting files !";
                 button3.Enabled = false;
                 button2.Enabled = true;
                 listBox1.Items.Clear();
@@ -262,6 +272,7 @@ namespace MushRoom
         // Cancel Button
         private void button3_Click(object sender, EventArgs e)
         {
+            this.cancel = true;
             if (backgroundWorker1.WorkerSupportsCancellation == true)
             {
                 backgroundWorker1.CancelAsync();
