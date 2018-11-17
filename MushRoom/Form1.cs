@@ -63,7 +63,7 @@ namespace MushRoom
         private void canAdd(string item) {
             // check extension of the file
             bool confirmed = false;
-            string ext = Path.GetExtension(item);
+            string ext = Path.GetExtension(item).ToLower();
 
             // support list
             if (ext == ".flac") { confirmed = true; } // FLAC Free Lossless Audio Codec
