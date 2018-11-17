@@ -7,6 +7,8 @@ https://i.imgur.com/uv87LHE.png
 
 basic functions:
 - Drag and Drop FLAC files
+- The form is also accepting audio input: .wav, .aac, .ac3 , .ape , .alac , .wma , .ogg , .mogg
+- The form is also accepting video input: .mp4, .avi, .mkv, .wmv, .mpg, .mpeg, .mov, .qt     
 - converts to mp3 in your bitrate of choosing [ 128, 160, 192, 224, 256, 320 Kbps ] 
 - can Output to same folder as source files
 - can Output to a target location
