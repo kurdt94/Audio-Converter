@@ -4,14 +4,17 @@ using System.Windows.Forms;
 using System.IO;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 
 
 // NOTES
 // @TODO : highlight current state, allow directory drop? 
 // 
 //
+
 namespace MushRoom
 {
+
     public partial class Form1 : Form
     {
         public string customTarget;
@@ -35,6 +38,8 @@ namespace MushRoom
             this.DragDrop += new DragEventHandler(Form1_DragDrop); 
         }
 
+
+
         // On Enter
         void Form1_DragEnter(object sender, DragEventArgs e)
         {
@@ -57,16 +62,40 @@ namespace MushRoom
 
         private void canAdd(string item) {
             // check extension of the file
+            bool confirmed = false;
+            string ext = Path.GetExtension(item);
 
-            if (Path.GetExtension(item) == ".flac")
+            // support list
+
+            if (ext == ".flac") { confirmed = true; } // FLAC Free Lossless Audio Codec
+            if (ext == ".wav") { confirmed = true; } // WAV WavPack
+            if (ext == ".aac") { confirmed = true; } // AAC Advanced Audio Coding
+            if (ext == ".ac3") { confirmed = true; } // AC3 ATSC A/52A (AC-3)
+            if (ext == ".ape") { confirmed = true; } // APE Monkey's Audio
+            if (ext == ".alac") { confirmed = true; } // ALAC Apple Lossless Audio Codec
+            if (ext == ".wma") { confirmed = true; } // WMA Windows Media Audio
+            if (ext == ".ogg") { confirmed = true; } // Ogg Xiph.Org
+            if (ext == ".mogg") { confirmed = true; } // Multitrack Ogg file
+
+            // support list video files ( audio > mp3 )
+            if (ext == ".mp4") { confirmed = true; } // MP4
+            if (ext == ".vob") { confirmed = true; } // Vob
+            if (ext == ".avi") { confirmed = true; } // AVI
+            if (ext == ".mkv") { confirmed = true; } // Matroska
+            if (ext == ".wmv") { confirmed = true; } // Windows Media Video
+            if (ext == ".mpg") { confirmed = true; } // MPEG Video
+            if (ext == ".mpeg") { confirmed = true; } // MPEG Video
+            if (ext == ".mov") { confirmed = true; } // QuickTime File Format
+            if (ext == ".qt") { confirmed = true; } // QuickTime File Format
+
+
+            if (confirmed)
             {
                 listBox1.Items.Add(item);
                 button1.Enabled = true;
                 button4.Enabled = true;
             }
-            else {
-             
-            }
+
         } 
 
         // Click CONVERT button
