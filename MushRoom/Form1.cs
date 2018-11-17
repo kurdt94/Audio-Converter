@@ -132,7 +132,7 @@ namespace MushRoom
             string flac_file = file;
             string mp3_file = Path.ChangeExtension(file, ".mp3");
             string quality = Properties.Settings.Default.quality;
-            toolStripStatusLabel3.Text = "Creating " + Path.GetFileName(mp3_file) + " ... ";
+         
 
             if(Properties.Settings.Default.samefolder == false && Directory.Exists(Properties.Settings.Default.target.ToString())){
                 mp3_file = Properties.Settings.Default.target + "\\" + Path.GetFileName(file);
@@ -158,14 +158,12 @@ namespace MushRoom
 
             // configuration -320k -map_metadata 0 -id3v2_version 3
             startInfo.Arguments = $"-y -i \"{flac_file}\" -b:a {quality}k -map_metadata 0 -id3v2_version 3 \"{mp3_file}\"";
-         
+            toolStripStatusLabel3.Text = "Creating " + Path.GetFileName(mp3_file) + " ... ";
             // Run FFMPEG
             try
             {
                 Process exeProcess = Process.Start(startInfo);
                 FFOutput = exeProcess.StandardError;
-
-                //ffoutput = SROutput.ReadToEnd();
 
                 // progression
                 int total_seconds = 0;
