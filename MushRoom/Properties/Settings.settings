@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="key01" Type="System.String" Scope="User">
-      <Value Profile="(Default)">&gt; Drag and drop .FLAC files to begin</Value>
+      <Value Profile="(Default)">&gt; Drag and drop files to begin</Value>
     </Setting>
     <Setting Name="Key02" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

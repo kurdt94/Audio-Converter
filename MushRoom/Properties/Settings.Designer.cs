@@ -25,7 +25,7 @@ namespace MushRoom.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("> Drag and drop .FLAC files to begin")]
+        [global::System.Configuration.DefaultSettingValueAttribute("> Drag and drop files to begin")]
         public string key01 {
             get {
                 return ((string)(this["key01"]));
