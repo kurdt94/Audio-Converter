@@ -76,6 +76,7 @@ namespace MushRoom
             if (ext == ".wma") { confirmed = true; } // WMA Windows Media Audio
             if (ext == ".ogg") { confirmed = true; } // Ogg Xiph.Org
             if (ext == ".mogg") { confirmed = true; } // Multitrack Ogg file
+            if (ext == ".mp3") { confirmed = true; } // Mp3
 
             // support list video files ( audio > mp3 )
             if (ext == ".flv") { confirmed = true; } // FLV
