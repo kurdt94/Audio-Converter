@@ -8,7 +8,7 @@ https://i.imgur.com/uv87LHE.png
 basic functions:
 - Drag and Drop files
 - The form is accepting audio input: .aac,.ac3,.alac,.ape,.flac,.mogg,.mp3,.ogg,.wav,.wma
-- The form is accepting video input: .avi,.flv,.mkv,.mov,.mp4,.mpeg,.mpg,.qt,.wmv   
+- The form is accepting video input: .avi,.flv,.mkv,.mov,.mp4,.mpeg,.mpg,.qt,.vob,.wmv   
 - converts to mp3 in your bitrate of choosing [ 128, 160, 192, 224, 256, 320 Kbps ]
 - can Output to same folder as source files
 - can Output to a target location
