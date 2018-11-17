@@ -78,7 +78,7 @@ namespace MushRoom
             if (ext == ".mogg") { confirmed = true; } // Multitrack Ogg file
 
             // support list video files ( audio > mp3 )
-
+            if (ext == ".flv") { confirmed = true; } // FLV
             if (ext == ".mp4") { confirmed = true; } // MP4
             if (ext == ".vob") { confirmed = true; } // Vob
             if (ext == ".avi") { confirmed = true; } // AVI
