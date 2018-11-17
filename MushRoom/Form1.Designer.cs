@@ -54,9 +54,10 @@
             // 
             // button1
             // 
+            this.button1.BackColor = System.Drawing.Color.LightGreen;
             resources.ApplyResources(this.button1, "button1");
             this.button1.Name = "button1";
-            this.button1.UseVisualStyleBackColor = true;
+            this.button1.UseVisualStyleBackColor = false;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // statusStrip1
@@ -129,6 +130,7 @@
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Control;
             this.Controls.Add(this.button4);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.button3);
