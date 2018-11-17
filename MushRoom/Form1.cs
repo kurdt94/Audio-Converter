@@ -23,13 +23,12 @@ namespace MushRoom
         public Form1()
         {
             InitializeComponent();
+            toolStripStatusLabel2.Text = "@" + Properties.Settings.Default.quality + " Kbps >";
 
             // Attach Event Handlers to BackgroundWorker
             backgroundWorker1.WorkerSupportsCancellation = true;
             backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker1_RunWorkerCompleted);
             backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker1_ProgressChanged);
-
-            toolStripStatusLabel2.Text = "@" + Properties.Settings.Default.quality + " Kbps >";
 
             // Set Drop Functionality
             this.cancel = false;
@@ -37,8 +36,6 @@ namespace MushRoom
             this.DragEnter += new DragEventHandler(Form1_DragEnter); 
             this.DragDrop += new DragEventHandler(Form1_DragDrop); 
         }
-
-
 
         // On Enter
         void Form1_DragEnter(object sender, DragEventArgs e)
@@ -58,6 +55,9 @@ namespace MushRoom
 
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             foreach (string file in files) { this.canAdd(file); }
+
+            // @TODO: autodrop
+            // this.button1.PerformClick();
         }
 
         private void canAdd(string item) {
@@ -66,7 +66,6 @@ namespace MushRoom
             string ext = Path.GetExtension(item);
 
             // support list
-
             if (ext == ".flac") { confirmed = true; } // FLAC Free Lossless Audio Codec
             if (ext == ".wav") { confirmed = true; } // WAV WavPack
             if (ext == ".aac") { confirmed = true; } // AAC Advanced Audio Coding
@@ -77,8 +76,7 @@ namespace MushRoom
             if (ext == ".ogg") { confirmed = true; } // Ogg Xiph.Org
             if (ext == ".mogg") { confirmed = true; } // Multitrack Ogg file
             if (ext == ".mp3") { confirmed = true; } // Mp3
-
-            // support list video files ( audio > mp3 )
+            // support list video 
             if (ext == ".flv") { confirmed = true; } // FLV
             if (ext == ".mp4") { confirmed = true; } // MP4
             if (ext == ".vob") { confirmed = true; } // Vob
@@ -89,7 +87,6 @@ namespace MushRoom
             if (ext == ".mpeg") { confirmed = true; } // MPEG Video
             if (ext == ".mov") { confirmed = true; } // QuickTime File Format
             if (ext == ".qt") { confirmed = true; } // QuickTime File Format
-
 
             if (confirmed)
             {
@@ -147,6 +144,11 @@ namespace MushRoom
                 mp3_file = Path.ChangeExtension(mp3_file, ".mp3");
             }
 
+            if (File.Exists(mp3_file)) {
+                mp3_file = Path.ChangeExtension(mp3_file, quality + ".mp3");
+                mp3_file = mp3_file.Replace('.' + quality, " (" + quality + ")");
+            }
+
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.CreateNoWindow = true;
             startInfo.RedirectStandardError = true;
@@ -175,11 +177,10 @@ namespace MushRoom
                 {
                     string s = FFOutput.ReadLine();
                   
-                    // get total duration
+                    // catch total duration
                     if (s.Contains("Duration: "))
                     {
                       total_seconds = this.ConverttoSeconds(s.Substring(s.LastIndexOf("Duration: "), 18).Replace("Duration: ", ""));
-                    //Console.WriteLine(total_seconds);
                     }
 
                     // check for progression
@@ -189,7 +190,6 @@ namespace MushRoom
 
                         if (total_seconds != 0) {
                             subprogress = (100 * current_second) / total_seconds;
-                            //Console.WriteLine(subprogress + " " + mp3_file);
                             backgroundWorker1.ReportProgress(subprogress);
                         }
 
