@@ -280,7 +280,7 @@ namespace MushRoom
             }
         }
 
-        // DrawItem ( currently not used, need to convert listbox to objects and such (map coloring class) ) 
+        // DrawItem ( currently not used, need to convert listbox to objects and such (map coloring class) . listview ) 
         private void listBox1_DrawItem(object sender, DrawItemEventArgs e)
         {
             e.DrawBackground();
