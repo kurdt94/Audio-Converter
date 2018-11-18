@@ -4,13 +4,11 @@ using System.Windows.Forms;
 using System.IO;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-
+using System.Collections.Generic;
 
 // NOTES
-// @TODO : highlight current state, allow directory drop? 
-// 
-//
+// @TODO
+// @Redo listBox / listView / doneList loop 
 
 namespace MushRoom
 {
@@ -19,12 +17,13 @@ namespace MushRoom
     {
         public string customTarget;
         public bool cancel;
+        public List<string> doneList;
 
         public Form1()
         {
             InitializeComponent();
             toolStripStatusLabel2.Text = "@" + Properties.Settings.Default.quality + " Kbps >";
-
+            doneList = new List<string>();
             // Attach Event Handlers to BackgroundWorker
             backgroundWorker1.WorkerSupportsCancellation = true;
             backgroundWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker1_RunWorkerCompleted);
@@ -109,7 +108,7 @@ namespace MushRoom
         // Click CONVERT button
         private void button1_Click(object sender, EventArgs e)
         {
-            // check for 
+            // check for Ask for folder
             if (Properties.Settings.Default.askfolder) { 
 
                 FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
@@ -120,6 +119,7 @@ namespace MushRoom
 
             }
 
+            // RunWorker
             if (backgroundWorker1.IsBusy != true)
             {
                 button1.Enabled = false;
@@ -133,11 +133,12 @@ namespace MushRoom
         }
 
         // Parse the FLAC file
-        private void parseFlac(string file) {
+        private void parseFlac(string file, int row) {
+
+            // if (listView1.Items[row].SubItems[2].Text == "Done" ) { return; }
 
             StreamReader FFOutput = null;
 
-            // Set
             string flac_file = file;
             string mp3_file = Path.ChangeExtension(file, ".mp3");
             string quality = Properties.Settings.Default.quality;
@@ -250,35 +251,40 @@ namespace MushRoom
 
             // Update status bar 
             toolStripStatusLabel3.Text = "Starting conversion !";
-            int i = 0; // no need for this really
+            int i = 0;
             foreach (var listBoxItem in listBox1.Items)
             {
+
                 // check cancel
                 if (worker.CancellationPending == true) {
                     e.Cancel = true;
                     break;
                 }
-                if (listView1.InvokeRequired)
+                        
+                if (listView1.InvokeRequired && doneList.Contains(i + "_done") == false)
                 {
                     listView1.Invoke((MethodInvoker)delegate ()
                     {
+                     
                         listView1.Items[i].SubItems[2].ForeColor = Color.Orange;
                         listView1.Items[i].SubItems[2].Text = "Busy";
-
+                       
                     });
                 }
-                this.parseFlac(listBoxItem.ToString());
+                if (doneList.Contains(i+"_done")) { i++; continue; }
+                this.parseFlac(listBoxItem.ToString(),i);
+
                 if (listView1.InvokeRequired)
                 {
                     listView1.Invoke((MethodInvoker)delegate ()
                     {
                         listView1.Items[i].SubItems[2].ForeColor = Color.Green;
                         listView1.Items[i].SubItems[2].Text = "Done";
-
+                        doneList.Add(i+"_done");
                     });
                 }
                 // Parse the FLAC file
-                i++; 
+                i++;
                
             }
             e.Result = true;
@@ -297,7 +303,6 @@ namespace MushRoom
            
         }
 
-   
         // This event handler deals with the results of the background operation.
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -306,6 +311,7 @@ namespace MushRoom
                 toolStripStatusLabel3.Text = "Last conversion canceled !";
                 button3.Enabled = false;
                 button1.Enabled = true;
+                button4.Enabled = false;
                 progressBar1.Value = 0;
                 this.cancel = false;
                 this.AllowDrop = true;
@@ -320,12 +326,19 @@ namespace MushRoom
                 toolStripStatusLabel3.Text = "Finished converting files !";
                 button3.Enabled = false;
                 button2.Enabled = true;
-                listBox1.Items.Clear();
-                listView1.Items.Clear();
                 progressBar1.Value = 0;
                 this.AllowDrop = true;
-                 
-                // AutoClear Setting?
+
+                // AutoClear Setting
+                if (Properties.Settings.Default.clearlist)
+                {
+                    listBox1.Items.Clear();
+                    listView1.Items.Clear();
+                    doneList.Clear();
+                }
+                else {
+                    button4.Enabled = true;
+                }
 
             }
         }
@@ -351,6 +364,7 @@ namespace MushRoom
         {
             listBox1.Items.Clear();
             listView1.Items.Clear();
+            doneList.Clear();
             button4.Enabled = false;
         }
     }

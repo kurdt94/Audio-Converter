@@ -94,5 +94,17 @@ namespace MushRoom.Properties {
                 this["askfolder"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool clearlist {
+            get {
+                return ((bool)(this["clearlist"]));
+            }
+            set {
+                this["clearlist"] = value;
+            }
+        }
     }
 }

@@ -28,6 +28,7 @@ namespace MushRoom
 
             comboBox1.SelectedItem = Properties.Settings.Default.quality;
             textBox1.Text = Properties.Settings.Default.target;
+            checkBox3.Checked = Properties.Settings.Default.clearlist;
             checkBox2.Checked = Properties.Settings.Default.askfolder;
             checkBox1.Checked = Properties.Settings.Default.samefolder;
 
@@ -43,6 +44,7 @@ namespace MushRoom
 
             // set Location properties
             Properties.Settings.Default.target = textBox1.Text.ToString();
+            Properties.Settings.Default.clearlist = checkBox3.Checked;
             Properties.Settings.Default.askfolder = checkBox2.Checked;
             Properties.Settings.Default.samefolder = checkBox1.Checked;
             Properties.Settings.Default.Save();
@@ -116,7 +118,6 @@ namespace MushRoom
             textBox1.Text = defaultPath;
 
         }
-
 
     }
 }
