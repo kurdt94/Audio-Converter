@@ -90,9 +90,18 @@ namespace MushRoom
 
             if (confirmed)
             {
-                listBox1.Items.Add(item);
+                ListViewItem itemlv = new ListViewItem();
+                itemlv.Text = Path.GetFileName(item); //filename
+                itemlv.SubItems.Add(Path.GetExtension(item)); //extension
+                itemlv.SubItems.Add("Pending"); // status
+                itemlv.SubItems.Add(item); // path
+                itemlv.UseItemStyleForSubItems = false;
+                listView1.Items.Add(itemlv);
+                listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+                listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
                 button1.Enabled = true;
                 button4.Enabled = true;
+                listBox1.Items.Add(item);
             }
 
         } 
@@ -241,7 +250,7 @@ namespace MushRoom
 
             // Update status bar 
             toolStripStatusLabel3.Text = "Starting conversion !";
-            int i = 1; // no need for this really
+            int i = 0; // no need for this really
             foreach (var listBoxItem in listBox1.Items)
             {
                 // check cancel
@@ -249,10 +258,28 @@ namespace MushRoom
                     e.Cancel = true;
                     break;
                 }
-        
-                // Parse the FLAC file
-                i++;  // no need for this really 
+                if (listView1.InvokeRequired)
+                {
+                    listView1.Invoke((MethodInvoker)delegate ()
+                    {
+                        listView1.Items[i].SubItems[2].ForeColor = Color.Orange;
+                        listView1.Items[i].SubItems[2].Text = "Busy";
+
+                    });
+                }
                 this.parseFlac(listBoxItem.ToString());
+                if (listView1.InvokeRequired)
+                {
+                    listView1.Invoke((MethodInvoker)delegate ()
+                    {
+                        listView1.Items[i].SubItems[2].ForeColor = Color.Green;
+                        listView1.Items[i].SubItems[2].Text = "Done";
+
+                    });
+                }
+                // Parse the FLAC file
+                i++; 
+               
             }
             e.Result = true;
 
@@ -294,8 +321,12 @@ namespace MushRoom
                 button3.Enabled = false;
                 button2.Enabled = true;
                 listBox1.Items.Clear();
+                listView1.Items.Clear();
                 progressBar1.Value = 0;
                 this.AllowDrop = true;
+                 
+                // AutoClear Setting?
+
             }
         }
         
@@ -309,13 +340,6 @@ namespace MushRoom
             }
         }
 
-        // DrawItem ( currently not used, need to convert listbox to objects and such (map coloring class) . listview ) 
-        private void listBox1_DrawItem(object sender, DrawItemEventArgs e)
-        {
-            e.DrawBackground();
-            e.Graphics.DrawString(listBox1.Items[e.Index].ToString(), listBox1.Font, Brushes.Green, e.Bounds);
-        }
-
         // Nothing ?
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -326,6 +350,7 @@ namespace MushRoom
         private void button4_Click(object sender, EventArgs e)
         {
             listBox1.Items.Clear();
+            listView1.Items.Clear();
             button4.Enabled = false;
         }
     }
