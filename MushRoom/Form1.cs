@@ -13,6 +13,9 @@ using System.Collections.Generic;
 namespace MushRoom
 {
 
+
+    
+
     public partial class Form1 : Form
     {
         public string customTarget;
@@ -22,7 +25,7 @@ namespace MushRoom
         public Form1()
         {
             InitializeComponent();
-            toolStripStatusLabel2.Text = "@" + Properties.Settings.Default.quality + " Kbps >";
+            toolStripStatusLabel2.Text = "@" + Properties.Settings.Default.quality + " > ";
             doneList = new List<string>();
             // Attach Event Handlers to BackgroundWorker
             backgroundWorker1.WorkerSupportsCancellation = true;
@@ -116,8 +119,28 @@ namespace MushRoom
                 {
                     customTarget = folderBrowserDialog1.SelectedPath + "\\";
                 }
+                else
+                {
+                    return;
+                }
 
             }
+
+            // check if field is empty and askfolder is also unchecked
+            if (string.IsNullOrWhiteSpace(Properties.Settings.Default.target) && Properties.Settings.Default.samefolder == false)
+            {
+                FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
+                if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    Properties.Settings.Default.target = folderBrowserDialog1.SelectedPath + "\\";
+                    customTarget = folderBrowserDialog1.SelectedPath + "\\";
+                }
+                else {
+                    return;
+                }
+
+            }
+            
 
             // RunWorker
             if (backgroundWorker1.IsBusy != true)
@@ -132,14 +155,14 @@ namespace MushRoom
             }
         }
 
-        // Parse the FLAC file
+        // Parse the FLAC (any audio) file
         private void parseFlac(string file, int row) {
 
             // if (listView1.Items[row].SubItems[2].Text == "Done" ) { return; }
 
             StreamReader FFOutput = null;
 
-            string flac_file = file;
+            string flac_file = file; // any supported audio file
             string mp3_file = Path.ChangeExtension(file, ".mp3");
             string quality = Properties.Settings.Default.quality;
          
@@ -157,8 +180,10 @@ namespace MushRoom
             if (File.Exists(mp3_file)) {
                 mp3_file = Path.ChangeExtension(mp3_file, quality + ".mp3");
                 mp3_file = mp3_file.Replace('.' + quality, " (" + quality + ")");
+
             }
 
+            // Process Setup
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.CreateNoWindow = true;
             startInfo.RedirectStandardError = true;
@@ -166,9 +191,31 @@ namespace MushRoom
             startInfo.FileName = Application.StartupPath + @"\common\ffmpeg.exe";
             startInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
-            // configuration -320k -map_metadata 0 -id3v2_version 3
-            startInfo.Arguments = $"-y -i \"{flac_file}\" -b:a {quality}k -map_metadata 0 -id3v2_version 3 \"{mp3_file}\"";
-            toolStripStatusLabel3.Text = "Creating " + Path.GetFileName(mp3_file) + " ... ";
+            
+            
+
+            // configuration for other formats -i audio.xxx -c:a flac audio.flac
+            if (quality == "FLAC") {
+               
+                mp3_file = Path.ChangeExtension(flac_file, ".flac");
+                toolStripStatusLabel3.Text = "Creating " + Path.GetFileName(mp3_file) + " ... ";
+                startInfo.Arguments = $"-y -i \"{flac_file}\" -c:a flac -compression_level 12 \"{mp3_file}\"";
+            }
+
+            // wav 
+            if (quality == "WAV 44-16")
+            {
+                mp3_file = Path.ChangeExtension(flac_file, ".wav");
+                toolStripStatusLabel3.Text = "Creating " + Path.GetFileName(mp3_file) + " ... ";
+                startInfo.Arguments = $"-y -i \"{flac_file}\" \"{mp3_file}\"";
+            }
+            else {
+                
+                toolStripStatusLabel3.Text = "Creating " + Path.GetFileName(mp3_file) + " ... ";
+                // default configuration -320k -map_metadata 0 -id3v2_version 3
+                quality = quality.Replace("MP3 ", "");
+                startInfo.Arguments = $"-y -i \"{flac_file}\" -b:a {quality}k -map_metadata 0 -id3v2_version 3 \"{mp3_file}\"";
+            }
             // Run FFMPEG
             try
             {
@@ -238,7 +285,7 @@ namespace MushRoom
         public void refreshing() {
             
             Properties.Settings.Default.Reload();
-            toolStripStatusLabel2.Text = "@" + Properties.Settings.Default.quality + " Kbps >";
+            toolStripStatusLabel2.Text = "@" + Properties.Settings.Default.quality + " > ";
             this.Refresh();
         }
 
