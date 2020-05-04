@@ -20,7 +20,7 @@ Note:
 Lossy MP3 should not be used for archiving, since the nature of lossy encoding always changes the original sound, even if it sounds transparent. Use lossless codecs for this purpose.
 
 Ideas (?) for upcoming releases:
-- Check for FFMPEG updates
-- Fashion up the design
-- Add some file-information tools
-- option to Clear selected files from the list ( ROFL )
+- auto-check for FFMPEG updates?
+- Fashion up the design?
+- Add some file-information tools in context-menu
+- Implement spek
