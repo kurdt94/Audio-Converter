@@ -16,6 +16,7 @@ namespace MushRoom
         public string customTarget;
         public bool cancel;
         public List<string> doneList;
+        public ContextMenuStrip menuStrip;
 
         public Form1()
         {
@@ -31,7 +32,36 @@ namespace MushRoom
             this.cancel = false;
             this.AllowDrop = true;
             this.DragEnter += new DragEventHandler(Form1_DragEnter); 
-            this.DragDrop += new DragEventHandler(Form1_DragDrop); 
+            this.DragDrop += new DragEventHandler(Form1_DragDrop);
+            CreateContextMenu();
+
+        }
+
+        private void CreateContextMenu()
+
+        {
+
+            ContextMenuStrip menuStrip = new ContextMenuStrip();
+
+            ToolStripMenuItem menuItem = new ToolStripMenuItem("Remove from list");
+            menuItem.Click += new EventHandler(menuStripMenuItem_Click);
+            
+            menuItem.Name = "Remove from list";
+            menuStrip.Items.Add(menuItem);
+
+            this.ContextMenuStrip = menuStrip;
+
+        }
+
+        private void menuStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count != 0)
+            {
+                foreach (ListViewItem LItem in listView1.SelectedItems)
+                {
+                    LItem.Remove();
+                }
+            }
         }
 
         // On Enter
@@ -405,6 +435,22 @@ namespace MushRoom
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void listView1_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                var hitTestInfo = listView1.HitTest(e.X, e.Y);
+                if (hitTestInfo.Item != null)
+                {
+                    var loc = e.Location;
+                    loc.Offset(listView1.Location);
+
+                    // Adjust context menu (or it's contents) based on hitTestInfo details
+                    this.menuStrip.Show(this, loc);
+                }
+            }
         }
 
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
