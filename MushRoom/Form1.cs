@@ -5,6 +5,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Linq;
 
 // NOTES
 // @TODO
@@ -12,10 +13,6 @@ using System.Collections.Generic;
 
 namespace MushRoom
 {
-
-
-    
-
     public partial class Form1 : Form
     {
         public string customTarget;
@@ -57,40 +54,24 @@ namespace MushRoom
 
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             foreach (string file in files) { this.canAdd(file); }
+            ResizeColumns();
 
-            // @TODO: autodrop
-            // this.button1.PerformClick();
+        }
+
+        private void ResizeColumns() {
+            listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
         }
 
         private void canAdd(string item) {
             // check extension of the file
-            bool confirmed = false;
+
             string ext = Path.GetExtension(item).ToLower();
+            string[] supp = {
+                ".flac", ".wav", ".aac", ".ac3", ".ape",".alac",".wma",".ogg",".mogg",".mp3",
+                ".flv",".mp4",".vob",".avi",".mkv",".wmv",".mpg",".mpeg",".mov",".qt"};
 
-            // support list
-            if (ext == ".flac") { confirmed = true; } // FLAC Free Lossless Audio Codec
-            if (ext == ".wav") { confirmed = true; } // WAV WavPack
-            if (ext == ".aac") { confirmed = true; } // AAC Advanced Audio Coding
-            if (ext == ".ac3") { confirmed = true; } // AC3 ATSC A/52A (AC-3)
-            if (ext == ".ape") { confirmed = true; } // APE Monkey's Audio
-            if (ext == ".alac") { confirmed = true; } // ALAC Apple Lossless Audio Codec
-            if (ext == ".wma") { confirmed = true; } // WMA Windows Media Audio
-            if (ext == ".ogg") { confirmed = true; } // Ogg Xiph.Org
-            if (ext == ".mogg") { confirmed = true; } // Multitrack Ogg file
-            if (ext == ".mp3") { confirmed = true; } // Mp3
-            // support list video 
-            if (ext == ".flv") { confirmed = true; } // FLV
-            if (ext == ".mp4") { confirmed = true; } // MP4
-            if (ext == ".vob") { confirmed = true; } // Vob
-            if (ext == ".avi") { confirmed = true; } // AVI
-            if (ext == ".mkv") { confirmed = true; } // Matroska
-            if (ext == ".wmv") { confirmed = true; } // Windows Media Video
-            if (ext == ".mpg") { confirmed = true; } // MPEG Video
-            if (ext == ".mpeg") { confirmed = true; } // MPEG Video
-            if (ext == ".mov") { confirmed = true; } // QuickTime File Format
-            if (ext == ".qt") { confirmed = true; } // QuickTime File Format
-
-            if (confirmed)
+            if (supp.Contains(ext))
             {
                 ListViewItem itemlv = new ListViewItem();
                 itemlv.Text = Path.GetFileName(item); //filename
@@ -99,13 +80,12 @@ namespace MushRoom
                 itemlv.SubItems.Add(item); // path
                 itemlv.UseItemStyleForSubItems = false;
                 listView1.Items.Add(itemlv);
-                listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-                listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+
                 button1.Enabled = true;
                 button4.Enabled = true;
                 listBox1.Items.Add(item);
             }
-
+            
         } 
 
         // Click CONVERT button
@@ -413,6 +393,62 @@ namespace MushRoom
             listView1.Items.Clear();
             doneList.Clear();
             button4.Enabled = false;
+        }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Open About
+            var About = new Form3();
+            About.ShowDialog();
+        }
+
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+
+            FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
+            if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
+            {
+                string[] files = Directory.GetFiles(folderBrowserDialog1.SelectedPath);
+
+                foreach (var file in files)
+                {
+                    canAdd(file);
+                }
+                ResizeColumns();
+            }
+            else
+            {
+                return;
+            }
+
+            // string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            // foreach (string file in files) { this.canAdd(file); }
+
+
+        }
+
+        private void advancedConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Open Settings
+            var Settings = new Form2(this);
+            Settings.ShowDialog();
+        }
+
+        private void toolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            // Open About
+            var About = new Form3();
+            About.ShowDialog();
         }
     }
 }
