@@ -169,10 +169,8 @@ namespace MushRoom
             startInfo.FileName = Application.StartupPath + @"\common\ffmpeg.exe";
             startInfo.WindowStyle = ProcessWindowStyle.Hidden;
 
-            
-            
-
-            // configuration for other formats -i audio.xxx -c:a flac audio.flac
+            // configuration for other formats
+            // need to redo this stuff
             if (quality == "FLAC") {
                
                 mp3_file = Path.ChangeExtension(flac_file, ".flac");
@@ -188,9 +186,8 @@ namespace MushRoom
                 startInfo.Arguments = $"-y -i \"{flac_file}\" \"{mp3_file}\"";
             }
             else {
-                
-                toolStripStatusLabel3.Text = "Creating " + Path.GetFileName(mp3_file) + " ... ";
                 // default configuration -320k -map_metadata 0 -id3v2_version 3
+                toolStripStatusLabel3.Text = "Creating " + Path.GetFileName(mp3_file) + " ... ";
                 quality = quality.Replace("MP3 ", "");
                 startInfo.Arguments = $"-y -i \"{flac_file}\" -b:a {quality}k -map_metadata 0 -id3v2_version 3 \"{mp3_file}\"";
             }
@@ -428,11 +425,6 @@ namespace MushRoom
             {
                 return;
             }
-
-            // string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            // foreach (string file in files) { this.canAdd(file); }
-
-
         }
 
         private void advancedConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
