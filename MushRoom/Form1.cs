@@ -8,8 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 // NOTES
-// @TODO
-// @Redo listBox / listView / doneList loop 
 
 namespace MushRoom
 {
