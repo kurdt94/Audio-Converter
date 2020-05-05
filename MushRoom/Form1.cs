@@ -8,7 +8,10 @@ using System.Collections.Generic;
 using System.Linq;
 
 // NOTES
-
+//@TODO
+//ffprobe -v quiet -print_format json -show_format -show_streams -print_format json "file"
+//shntool fix
+//shntool info form, only enable menuitem when compatible file, else lame info ? ..
 namespace MushRoom
 {
     public partial class Form1 : Form
@@ -18,6 +21,7 @@ namespace MushRoom
         public List<string> doneList;
         public ContextMenuStrip menuStrip;
 
+        // INIT
         public Form1()
         {
             InitializeComponent();
@@ -37,22 +41,37 @@ namespace MushRoom
 
         }
 
+        // ContextMenu Items 
         private void CreateContextMenu()
 
         {
 
             ContextMenuStrip menuStrip = new ContextMenuStrip();
 
-            ToolStripMenuItem menuItem = new ToolStripMenuItem("Remove from list");
+            // Clear selected item(s)
+            ToolStripMenuItem menuItem = new ToolStripMenuItem("Clear selected item(s)");
             menuItem.Click += new EventHandler(menuStripMenuItem_Click);
-            
             menuItem.Name = "Remove from list";
             menuStrip.Items.Add(menuItem);
+
+            // Clear list
+            ToolStripMenuItem menuItem2 = new ToolStripMenuItem("Clear list");
+            menuItem2.Click += new EventHandler(menuStripMenuItem2_Click);
+            menuItem2.Name = "Remove from list";
+            menuStrip.Items.Add(menuItem2);
+
+            menuStrip.Items.Add(new ToolStripSeparator());
+
+            // Get FileInfo (shntool info)
+            ToolStripMenuItem menuItem3 = new ToolStripMenuItem("Run shntool info");
+            menuItem3.Click += new EventHandler(menuStripMenuItem3_Click);
+            menuItem3.Name = "Get file-information";
+            menuStrip.Items.Add(menuItem3);
 
             this.ContextMenuStrip = menuStrip;
 
         }
-
+        // Function: Clear selected item(s)
         private void menuStripMenuItem_Click(object sender, EventArgs e)
         {
             if (listView1.SelectedItems.Count != 0)
@@ -63,8 +82,33 @@ namespace MushRoom
                 }
             }
         }
+        //Function:  Clear list
+        private void menuStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            // same as clear (button4_click)
+            listBox1.Items.Clear();
+            listView1.Items.Clear();
+            doneList.Clear();
+            button4.Enabled = false;
+        }
 
-        // On Enter
+        // Get File-Information
+        private void menuStripMenuItem3_Click(object sender, EventArgs e) {
+
+            if (listView1.SelectedItems.Count != 0)
+            {
+                foreach (ListViewItem LItem in listView1.SelectedItems)
+                {
+                    String text = listView1.SelectedItems[0].SubItems[3].Text; //path
+                    //MessageBox.Show(text, "Message", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    fileInfo(text);
+                    // shntool call with $text ( the path )
+                }
+            }
+
+        }
+
+        // On DRAGEnter 
         void Form1_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
@@ -74,10 +118,11 @@ namespace MushRoom
         void Form1_DragDrop(object sender, DragEventArgs e)
         {
 
-            // Don't drop on running progress
+            // Preventdrop on running progress
             if (backgroundWorker1.IsBusy == true)
             {
                 MessageBox.Show("Can't drop files while running", "Message", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
@@ -86,17 +131,19 @@ namespace MushRoom
 
         }
 
+        // Resize Columns
         private void ResizeColumns() {
             listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             listView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
         }
 
+        // Add Item To list
         private void canAdd(string item) {
             // check extension of the file
 
             string ext = Path.GetExtension(item).ToLower();
             string[] supp = {
-                ".flac", ".wav", ".aac", ".ac3", ".ape",".alac",".wma",".ogg",".mogg",".mp3",
+                ".flac", ".wav", ".aac", ".ac3", ".ape",".alac",".wma",".ogg",".mogg",".mp3",".shn",
                 ".flv",".mp4",".vob",".avi",".mkv",".wmv",".mpg",".mpeg",".mov",".qt"};
 
             if (supp.Contains(ext))
@@ -270,7 +317,55 @@ namespace MushRoom
 
         }
 
-        // Convert Track lenght to seconds
+        // Get File Info SHNTOOL INFO
+        private void fileInfo(string file)
+        {
+
+            StreamReader FFOutput = null;
+
+           // string file = file; // any supported audio file
+
+            if (File.Exists(file))
+            {
+         
+            // Process Setup
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.CreateNoWindow = true;
+            startInfo.RedirectStandardError = true;
+            startInfo.UseShellExecute = false;
+            startInfo.FileName = Application.StartupPath + @"\common\shntool.exe";
+            startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            startInfo.RedirectStandardOutput = true;
+            String Reset = toolStripStatusLabel3.Text;
+            toolStripStatusLabel3.Text = "Getting File Information from " + Path.GetFileName(file) + " ... ";
+            startInfo.Arguments = $"info \"{file}\"";
+
+            // Run SHNTOOL
+            try
+            {
+                Process exeProcess = Process.Start(startInfo);
+                FFOutput = exeProcess.StandardError;
+                exeProcess.WaitForExit();
+
+                string output;
+                output = exeProcess.StandardOutput.ReadToEnd();
+                exeProcess.WaitForExit();
+
+               // Console.WriteLine(output);
+                exeProcess.Close();
+                exeProcess.Dispose(); // needed ??
+                open_Information_Form(output);
+                }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+                toolStripStatusLabel3.Text = Reset;
+                
+            }
+        }
+
+        // Convert Track lenght to seconds [progress calculation]
         private int ConverttoSeconds(string s)
         {
             //we can just parse a time format "00:00:11" and return an integer
@@ -278,7 +373,13 @@ namespace MushRoom
             return Convert.ToInt32(seconds); 
         }
 
-        // Settings
+        // Open File Information Form
+        private void open_Information_Form(string info_output) {
+            var Info = new Form4(info_output);
+            Info.ShowDialog();
+        }
+
+        // Open Settings Form
         private void button2_Click(object sender, EventArgs e)
         {
             // Open Settings
@@ -286,9 +387,8 @@ namespace MushRoom
             Settings.ShowDialog();
         }
 
-        // Reload Settings 
-        public void refreshing() {
-            
+        // Refresh Settings 
+        public void refreshing() {       
             Properties.Settings.Default.Reload();
             toolStripStatusLabel2.Text = "@" + Properties.Settings.Default.quality + " > ";
             this.Refresh();
@@ -420,23 +520,25 @@ namespace MushRoom
             button4.Enabled = false;
         }
 
+        // Nothing
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
 
         }
-
+       
+        // Open About
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            // Open About
+        {      
             var About = new Form3();
             About.ShowDialog();
         }
-
+        // Nothing
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }
 
+        // Right Click Context Menu
         private void listView1_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
@@ -453,6 +555,7 @@ namespace MushRoom
             }
         }
 
+        // Add Folder via MENU
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
         {
 
@@ -472,17 +575,17 @@ namespace MushRoom
                 return;
             }
         }
-
+        
+        // Open Settings
         private void advancedConfigurationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // Open Settings
             var Settings = new Form2(this);
             Settings.ShowDialog();
         }
 
+        // Open About from Menu
         private void toolStripMenuItem3_Click(object sender, EventArgs e)
         {
-            // Open About
             var About = new Form3();
             About.ShowDialog();
         }
