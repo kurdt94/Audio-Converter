@@ -182,7 +182,7 @@ namespace MushRoom
             }
 
             // check if field is empty and askfolder is also unchecked
-            if (string.IsNullOrWhiteSpace(Properties.Settings.Default.target) && Properties.Settings.Default.samefolder == false)
+            if (string.IsNullOrWhiteSpace(Properties.Settings.Default.target) && Properties.Settings.Default.samefolder == false && Properties.Settings.Default.askfolder == false)
             {
                 FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
                 if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
