@@ -1,4 +1,4 @@
-# Audio-Converter
+# Audio-Converter [no longer continued]
 
 A quick C# GUI with basic options to convert various files > MP3 using FFMPEG. 
 by manually replacing the file. 
